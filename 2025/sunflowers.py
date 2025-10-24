@@ -23,7 +23,7 @@ def add_flower(di, x, y, value):
     return di
 
 def harvest_most_power():
-    world_size = get_world_size()
+    world_size = get_world_size()  # SIZE
     home()
     try_power()
 
@@ -49,12 +49,33 @@ def harvest_most_power():
 def get_sunflowers(limit=10000):
     home()
     set_world_size(12) # Smaller to speed things up
-    
+
     while num_items(Items.Power) < limit:
         set_ground(Grounds.Soil, Entities.Sunflower)
         harvest_most_power()
-        
+
     set_world_size(0)
-        
+
+######
+
+def harvest_petals(petals):
+    if measure() == petals:
+        while not can_harvest():
+            do_a_flip()
+        harvest()
+        if petals > 7:
+            plant(Entities.Carrot)
+
+def multi_sunflowers(limit=10000):
+    home()
+
+    while num_items(Items.Power) < limit:
+        set_ground(Grounds.Soil, Entities.Sunflower)
+        for petals in range(15, 6, -1):
+            for_all_row(call_arg(harvest_petals, petals))
+            try_power()
+
+
 if __name__ == "__main__":
-    get_sunflowers(10000)
+    # get_sunflowers(10000)
+    multi_sunflowers(120000)

@@ -50,8 +50,8 @@ def swap_ground(for_item):
     case1 = ground == Grounds.Soil and for_item == Entities.Grass
     case2 = ground == Grounds.Grassland and for_item != Entities.Grass
     if case1 or case2:
-        till()   
-             
+        till()
+
 def plant_x(req, want, x, y):
     go_to(x, y)
     etype = get_entity_type()
@@ -59,7 +59,7 @@ def plant_x(req, want, x, y):
         return True
     if etype and etype != Entities.Grass:
         return False
-    
+
     # Swap ground type
     swap_ground(req)
 
@@ -69,7 +69,6 @@ def plant_x(req, want, x, y):
     return True
 
 def companion_plant(preferred_item, limit=100000):
-    world_size = get_world_size()
     entity = ITEM2SEED[preferred_item]
 
     #if not check_cost(entity, limit - num_items(preferred_item)):
@@ -80,15 +79,15 @@ def companion_plant(preferred_item, limit=100000):
         set_ground(Grounds.Grassland)
     else:
         set_ground(Grounds.Soil)
-        
+
     while num_items(preferred_item) < limit:
         try_power()
         home()
         farm = {"requested": [], "companions": []}
         done = set()
-        
-        for y in range(world_size):
-            for x in range(world_size):
+
+        for y in range(SIZE):
+            for x in range(SIZE):
                 pos = (x, y)
                 if pos not in done and plant_x(entity, entity, x, y):
                     farm["requested"].append((x, y))
@@ -100,13 +99,13 @@ def companion_plant(preferred_item, limit=100000):
                             done.add((i, j))
                             farm["companions"].append((i, j))
             try_power()
-        
+
         while len(farm["requested"]):
             x, y = farm["requested"].pop()
             go_to(x, y)
             while not can_harvest():
                 continue
-            harvest()        
+            harvest()
         while len(farm["companions"]):
             x, y = farm["companions"].pop()
             go_to(x, y)

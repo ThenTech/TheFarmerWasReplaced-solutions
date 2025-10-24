@@ -2,8 +2,8 @@ from utils import *
 
 def get_grass(limit=100000):
     try_power()
-    
-    for i in range(get_world_size()):
+
+    for i in range(SIZE):
         if get_ground_type() != Grounds.Grassland:
             if can_harvest():
                 harvest()
@@ -15,10 +15,10 @@ def get_grass(limit=100000):
             harvest()
         move(North)
         try_power(30)
-            
+
 def get_wood(limit=100000, fertilize=False):
     try_power()
-    
+
     while num_items(Items.Wood) < limit:
         if can_harvest():
             harvest()
@@ -32,7 +32,7 @@ def get_wood(limit=100000, fertilize=False):
             plant(Entities.Bush)
         move_next()
         try_power(30)
-        
+
 def get_carrots(limit=10000):
     if num_items(Items.Carrot) >= limit:
         return
@@ -49,7 +49,6 @@ def get_carrots(limit=10000):
 
 def get_pumpkins(limit=100000):
     try_power()
-    world_size = get_world_size() 
     home()
 
     while num_items(Items.Pumpkin) < limit:
@@ -59,13 +58,13 @@ def get_pumpkins(limit=100000):
         home()
 
         leftover_pos = []
-        for y in range(world_size):
-            for x in range(world_size):
+        for y in range(SIZE):
+            for x in range(SIZE):
                 if not is_or_plant(Entities.Pumpkin):
                     leftover_pos.append((x, y))
                 move(East)
             move(North)
-            
+
         try_power()
 
         while len(leftover_pos) > 0:

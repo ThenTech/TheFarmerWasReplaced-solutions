@@ -1,8 +1,13 @@
+SIZE = get_world_size()
+
+def get_pos():
+    return get_pos_x(), get_pos_y()
+
 def move_next():
     move(North)
     if get_pos_y() == 0:
         move(East)
-        
+
 def home():
     # Reset to 0, 0
     while get_pos_x() > 0:
@@ -10,19 +15,49 @@ def home():
     while get_pos_y() > 0:
         move(South)
 
-def go_to(x, y):
-    moved = 0
+def go_to_simple(x, y):
     while get_pos_x() < x:
-        moved += move(East)
+        move(East)
     while get_pos_x() > x:
-        moved += move(West)
+        move(West)
     while get_pos_y() < y:
-        moved += move(North)
+        move(North)
     while get_pos_y() > y:
-        moved += move(South)
-    return moved
+        move(South)
+
+def move_dir(n, dir):
+    for _ in range(n):
+        move(dir)
+
+def go_to(x, y):
+    SIZE = get_world_size()
+    cx, cy = get_pos()
+
+    delta_x = (x - cx)             # 0 - 6   = -6
+    delta_x_east = delta_x % SIZE  # -6 % 10 = 4
+    delta_x_west = -delta_x % SIZE #  6 % 10 = 6
+
+    if delta_x_west <= delta_x_east:
+        move_dir(delta_x_west, West)
+    else:
+        move_dir(delta_x_east, East)
+
+    delta_y = (y - cy)
+    delta_y_north = delta_y % SIZE
+    delta_y_south = -delta_y % SIZE
+
+    if delta_y_north <= delta_y_south:
+        move_dir(delta_y_north, North)
+    else:
+        move_dir(delta_y_south, South)
+
 
 #####################
+
+def call_arg(f, arg):
+    def g():
+        f(arg)
+    return g
 
 def await_first(drones):
     for h in drones:
@@ -35,45 +70,42 @@ def await_all(drones):
         wait_for(h)
 
 def _create_for_each(dir, fast=False):
-    size = get_world_size()
-    
-    def for_each(cb):
+    SIZE = get_world_size()
+
+    def for_each2(cb):
+        progress = 0
         drones = []
-        for _ in range(size):
-            handle = spawn_drone(cb)
-            if not handle:
-                # Wait for next completion, but only if not on last
-                # row/col, then just do it ourselves.
-                if fast and (get_pos_x() < size-1 and get_pos_y() < size-1):
-                    # Or: wait for the first unfinished drone
-                    # so we can spawn a new one immediately?
-                    # (else the main drone could still be busy while
-                    #  others have finished, blocking the spawning)
-                    await_first(drones)
-                    drones.append(spawn_drone(cb))
+
+        while progress < SIZE:
+            # First spawn as many as possible
+            while progress < SIZE and num_drones() < max_drones():
+                drones.append(spawn_drone(cb))
+                progress += 1
+                move(dir)
+            if progress < SIZE and num_drones() == max_drones():
+                # If not done, try to do the task ourselves
+                if not fast or (dir == East and get_pos_x() == SIZE-1) or (dir == North and get_pos_y() == SIZE-1):
+                    cb()
+                    progress += 1
                     move(dir)
                 else:
-                    cb() # Either do the taks ourselves
-            else:
-                drones.append(handle)
-                if fast:
-                    move(dir)
-            if not fast:  
-                move(dir)
-        # Sync
-        await_all(drones)
-    return for_each
+                    # Or if fast, wait for the next drone, so we can immediately spawn more
+                    await_first(drones)
+        await_all(drones)  # Sync
+
+    return for_each2
 
 def _create_for_all(dir, fe):
+    SIZE = get_world_size()
     def for_all(f):
         home()
         def row():
-            for _ in range(get_world_size()):
+            for _ in range(SIZE):
                 f()
                 move(dir)
-        for_each_row(row)
+        fe(row)
     return for_all
-    
+
 for_each_row = _create_for_each(North)
 for_each_row_fast = _create_for_each(North, True)
 for_each_col = _create_for_each(East)
@@ -87,7 +119,7 @@ for_all_col = _create_for_all(North, for_each_col)
 def try_watering():
     if num_items(Items.Water) > 0 and get_water() < 0.2:
         use_item(Items.Water)
-        
+
 def try_fertilize():
     if num_items(Items.Fertilizer) > 0:
         use_item(Items.Fertilizer)
@@ -111,7 +143,7 @@ def set_ground(ground, and_plant=None):
     def reset():
         set_ground_single(ground, and_plant)
     for_all_row(reset)
-        
+
 def is_or_plant(type):
     if get_entity_type() != type:
         harvest()

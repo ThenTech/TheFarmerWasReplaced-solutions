@@ -1,16 +1,16 @@
 from utils import *
 
 def multi_grass(limit):
-    set_ground(Grounds.Grassland)   
+    set_ground(Grounds.Grassland)
     while num_items(Items.Hay) < limit:
         for_all_row(harvest)
         try_power(30)
-    
+
 def multi_wood(limit, fertilize=False):
     set_ground(Grounds.Grassland)
-    
+
     def row():
-        for _ in range(get_world_size()):
+        for _ in range(SIZE):
             if can_harvest():
                 harvest()
             p = get_pos_x() + get_pos_y()
@@ -22,7 +22,7 @@ def multi_wood(limit, fertilize=False):
             else:
                 plant(Entities.Bush)
             move(East)
- 
+
     while num_items(Items.Wood) < limit:
         home()
         try_power()
@@ -30,20 +30,19 @@ def multi_wood(limit, fertilize=False):
 
 def multi_carrot(limit):
     set_ground(Grounds.Soil, Entities.Carrot)
-    
+
     def action():
         if can_harvest():
             harvest()
         plant(Entities.Carrot)
         #try_watering()
-        
+
     while num_items(Items.Carrot) < limit:
         try_power()
         for_all_row(action)
 
 def multi_pumpkin(limit):
     try_power()
-    world_size = get_world_size() 
     home()
 
     def action():
@@ -51,7 +50,7 @@ def multi_pumpkin(limit):
         row = []
 
         # First check: fill with failed pumpkin positions
-        for x in range(world_size):
+        for x in range(SIZE):
             if not is_or_plant(Entities.Pumpkin):
                 row.append(get_pos_x())
             move(East)

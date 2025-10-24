@@ -8,14 +8,13 @@ def has_treasure(dig=True):
             harvest()
         return True
     return False
-    
+
 def get_next_move(x, y, visited, visit_limit):
-    size = get_world_size()
     npos = [(x+1,y), (x,y-1), (x-1,y), (x,y+1)]
 
     for i in range(4):
         nx, ny = npos[i]
-        if nx < 0 or ny < 0 or nx > size-1 or ny > size-1:
+        if nx < 0 or ny < 0 or nx > SIZE-1 or ny > SIZE-1:
             continue
         if visited[nx][ny] > visit_limit:
             continue
@@ -28,12 +27,11 @@ def move_through_maze():
     if has_treasure():
         return
     # set up visited grid
-    size = get_world_size()
     visited = []
 
-    for x in range(size):
+    for x in range(SIZE):
         visited.append([])
-        for y in range(size):
+        for y in range(SIZE):
             visited[x].append(0)
 
     x = get_pos_x()
@@ -61,8 +59,8 @@ def move_through_maze():
 def a_maze_ing(limit):
     clear()
 
-    substance = get_world_size() * 2**(num_unlocked(Unlocks.Mazes) - 1)
- 
+    substance = SIZE * 2**(num_unlocked(Unlocks.Mazes) - 1)
+
     while num_items(Items.Gold) < limit:
         if num_items(Items.Weird_Substance) < 100:
             do_a_flip()
@@ -82,6 +80,6 @@ def a_maze_ing(limit):
         # Find the treasure
         try_power()
         move_through_maze()
-        
+
 if __name__ == "__main__":
     a_maze_ing(1000000)

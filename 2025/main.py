@@ -1,6 +1,6 @@
 from utils import *
 from basics import *
-from sunflowers import get_sunflowers
+from sunflowers import multi_sunflowers
 from companion import companion_plant, check_cost
 from maze import a_maze_ing
 from multi import *
@@ -8,13 +8,13 @@ from cactus import multi_cactus
 from dino import get_bones
 
 def reset_wanted():
-    return [ #             B  M  k 
+    return [ #             B  M  k
+        [Items.Power   ,       10000 ], # Priority
         [Items.Hay     ,     5000000 ],
         [Items.Wood    ,     5000000 ],
         [Items.Carrot  ,     1700000 ],
         [Items.Pumpkin ,     5000000 ],
         [Items.Weird_Substance, 2000 ],
-        [Items.Power   ,        2500 ],
         [Items.Gold    ,       20000 ],
         [Items.Cactus  ,     2600000 ],
         [Items.Bone    ,       10000 ],
@@ -25,16 +25,14 @@ def main():
 
     wanted = reset_wanted()
     want_unlock = [
-        Unlocks.Cactus,
-        Unlocks.Mazes,
-        Unlocks.Dinosaurs,
-        Unlocks.Pumpkins,
+        Unlocks.The_Farmers_Remains,
+        Unlocks.Top_Hat,
     ]
 
     while len(want_unlock) > 0:
         for want in wanted:
             item, qty = want
-            to_get_qty = qty - num_items(item) 
+            to_get_qty = qty - num_items(item)
             if to_get_qty <= 0:
                 continue
             check_cost(item, to_get_qty)
@@ -54,7 +52,7 @@ def main():
             elif item == Items.Pumpkin:
                 multi_pumpkin(qty)
             elif item == Items.Power:
-                get_sunflowers(qty)
+                multi_sunflowers(qty)
             elif item == Items.Gold:
                 a_maze_ing(qty)
             elif item == Items.Cactus:
@@ -70,11 +68,12 @@ def main():
             if not costs:
                 want_unlock.pop(0)
                 wanted = reset_wanted()
-            for req in costs:
-                for want in wanted:
-                    if want[0] == req and want[1] < costs[req]:
-                        want[1] = costs[req]
-                        break
+            else:
+                for req in costs:
+                    for want in wanted:
+                        if want[0] == req and want[1] < costs[req]:
+                            want[1] = costs[req]
+                            break
 
 if __name__ == "__main__":
     change_hat(Hats.Traffic_Cone)
@@ -86,4 +85,4 @@ if __name__ == "__main__":
     #companion_plant(Items.Wood, 2000000)
 
     #set_ground(Grounds.Soil, Entities.Carrot)
-    #get_sunflowers(100000)
+    #multi_sunflowers(100000)

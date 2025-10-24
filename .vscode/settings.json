@@ -1,0 +1,12 @@
+{
+    "editor.insertSpaces": true,
+    "editor.linkedEditing": true,
+    "editor.stickyScroll.enabled": true,
+    "editor.tabSize": 4,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "files.trimTrailingWhitespace": true,
+    "python.languageServer": "Pylance",
+    "python.analysis.typeCheckingMode": "basic",
+    "ruff.enable": false
+}

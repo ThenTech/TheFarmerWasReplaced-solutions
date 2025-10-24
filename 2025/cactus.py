@@ -1,16 +1,15 @@
 from utils import *
 
 def create_sorter(dir):
-    n = get_world_size()
     def reset_pos(j):
         if dir == North:
             go_to(get_pos_x(), j)
         else:
             go_to(j, get_pos_y())
     def sort():
-        for i in range(n):
+        for i in range(SIZE):
             is_sorted = True
-            for j in range(n - i - 1):
+            for j in range(SIZE - i - 1):
                 reset_pos(j)
                 if measure() > measure(dir):
                     is_sorted = False
@@ -23,7 +22,7 @@ def create_sorter(dir):
 def multi_cactus(limit=1000):
     if num_items(Items.Cactus) >= limit:
         return
-        
+
     def reset():
         set_ground_single(Grounds.Soil, Entities.Cactus)
     def action():
@@ -33,7 +32,7 @@ def multi_cactus(limit=1000):
     for_all_row(reset)
     row_sort = create_sorter(East)
     col_sort = create_sorter(North)
-    
+
     while num_items(Items.Cactus) < limit:
         home()
         for_each_row_fast(row_sort)
